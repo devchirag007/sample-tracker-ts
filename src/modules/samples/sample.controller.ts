@@ -1,12 +1,18 @@
 import { asyncHandler } from "../../utils/async-handler"
-import { createSampleSchema, idParamSchema, updateStatusSchema } from "./sample.schema"
+import {
+  createSampleSchema,
+  idParamSchema,
+  listSamplesQuerySchema,
+  updateStatusSchema,
+} from "./sample.schema"
 import type { SampleService } from "./sample.service"
 
 // asyncHandler forwards rejected promises to the error middleware (Express 4 needs this).
 export const createSampleController = (service: SampleService) => {
-  const list = asyncHandler(async (_req, res) => {
-    const samples = await service.list()
-    res.status(200).json({ success: true, data: samples })
+  const list = asyncHandler(async (req, res) => {
+    const query = listSamplesQuerySchema.parse(req.query)
+    const { data, meta } = await service.listPage(query)
+    res.status(200).json({ success: true, data, meta })
   })
 
   const getById = asyncHandler(async (req, res) => {

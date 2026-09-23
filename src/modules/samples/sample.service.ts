@@ -1,10 +1,26 @@
 import { ConflictError, NotFoundError } from "../../errors/app-error"
 import type { SampleRepository } from "./sample.repository"
-import type { CreateSampleInput, Sample, SampleStatus } from "./sample.types"
+import type {
+  CreateSampleInput,
+  PageRequest,
+  Paginated,
+  Sample,
+  SampleStatus,
+} from "./sample.types"
 
 export const createSampleService = (repository: SampleRepository) => ({
   async list(): Promise<Sample[]> {
     return repository.findAll()
+  },
+
+  async listPage({ page, limit }: PageRequest): Promise<Paginated<Sample>> {
+    const all = await repository.findAll()
+    const start = (page - 1) * limit
+    return {
+      // slice() returns a new array, so the repository's data is never touched.
+      data: all.slice(start, start + limit),
+      meta: { page, limit, total: all.length, totalPages: Math.ceil(all.length / limit) },
+    }
   },
 
   async getById(id: number): Promise<Sample> {

@@ -22,3 +22,18 @@ export interface Sample {
 }
 
 export type CreateSampleInput = Omit<Sample, "id">
+
+export interface PageRequest {
+  page: number
+  limit: number
+}
+
+export interface PageMeta extends PageRequest {
+  total: number
+  totalPages: number
+}
+
+export interface Paginated<T> {
+  data: T[]
+  meta: PageMeta
+}
